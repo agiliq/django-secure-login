@@ -47,6 +47,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+AUTHENTICATION_BACKENDS = ("secure_login.backends.SecureLoginBackend", )
+
 ROOT_URLCONF = 'example.urls'
 
 WSGI_APPLICATION = 'example.wsgi.application'

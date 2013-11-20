@@ -1,3 +1,19 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
-# Create your tests here.
+class SecureLoginBackendTest(TestCase):
+    def test_no_weak_passwords(self):
+        bad_password = "abc"
+        good_password = "a-l0ng-pa55w0rd-@^&"
+        user = User.objects.create(username="hello")
+        user.set_password("abc")
+        user.save()
+        self.assertFalse(authenticate(username="hello", password=bad_password))
+
+        user.set_password(good_password)
+        user.save()
+        self.assertEqual(authenticate(username="hello", password=good_password), user)
+
+
+
