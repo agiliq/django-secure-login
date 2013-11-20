@@ -12,3 +12,4 @@ TODO
 * Emails admins on X failed attempts.
 * Email user on a failed login attempt for them.
 * Integrate with fail2ban.
+* Support 2F authentication
