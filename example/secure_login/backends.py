@@ -23,5 +23,7 @@ class SecureLoginBackend(backends.ModelBackend):
         return True
 
     def no_short_passwords(self, username=None, password=None, **kwargs):
-        if len(password) <
+        if len(password) < getattr(settings, "SECURE_LOGIN_MIN_PASSWORD_LENGTH", 6):
+            return False
+        return True
 
