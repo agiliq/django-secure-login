@@ -27,3 +27,16 @@ class SecureLoginBackendTest(TestCase):
         user.set_password(good_password)
         user.save()
         self.assertEqual(authenticate(username="hello", password=good_password), user)
+
+    def test_no_username_password_same(self):
+        username = "hellohello"
+        bad_password = "hellohello"
+        good_password = "a-l0ng-pa55w0rd-@^&"
+        user = User.objects.create(username=username)
+        user.set_password(bad_password)
+        user.save()
+        self.assertFalse(authenticate(username=username, password=bad_password))
+
+        user.set_password(good_password)
+        user.save()
+        self.assertEqual(authenticate(username=username, password=good_password), user)

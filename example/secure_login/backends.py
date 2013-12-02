@@ -14,6 +14,8 @@ class SecureLoginBackend(backends.ModelBackend):
     def authenticate(self, username=None, password=None, **kwargs):
         if not self.no_weak_passwords(username, password, **kwargs):
             return None
+        if not self.no_username_password_same(username, password, **kwargs):
+            return None
         return super(SecureLoginBackend, self).authenticate(username, password, **kwargs)
 
     def no_weak_passwords(self, username=None, password=None, **kwargs):
@@ -27,3 +29,7 @@ class SecureLoginBackend(backends.ModelBackend):
             return False
         return True
 
+    def no_username_password_same(self, username=None, password=None, **kwargs):
+        if username == password:
+            return False
+        return True
