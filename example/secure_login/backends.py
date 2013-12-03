@@ -2,15 +2,6 @@ from django.contrib.auth import backends
 from django.conf import settings
 
 
-DEFAULT_CHECKERS = ["secure_login.checkers.no_weak_passwords",
-                    "secure_login.checkers.no_short_passwords",
-                    "secure_login.checkers.no_username_password_same"]
-
-checkers = getattr(settings, "SECURE_LOGIN_CHECKERS", DEFAULT_CHECKERS)
-
-DEFAULT_ON_FAIL = ["secure_login.on_fail.email_user",]
-on_fail_callables = getattr(settings, "SECURE_LOGIN_ON_FAIL", DEFAULT_ON_FAIL)
-
 def get_callable(callable_str):
     path = callable_str.split(".")
     module_name = ".".join(path[:-1])
@@ -22,7 +13,16 @@ def get_callable(callable_str):
 
 class SecureLoginBackendMixin(object):
 
-    def authenticate1(self, username=None, password=None, **kwargs):
+    def authenticate(self, username=None, password=None, **kwargs):
+        DEFAULT_CHECKERS = ["secure_login.checkers.no_weak_passwords",
+                            "secure_login.checkers.no_short_passwords",
+                            "secure_login.checkers.no_username_password_same"]
+
+        checkers = getattr(settings, "SECURE_LOGIN_CHECKERS", DEFAULT_CHECKERS)
+
+        DEFAULT_ON_FAIL = ["secure_login.on_fail.email_user",]
+        on_fail_callables = getattr(settings, "SECURE_LOGIN_ON_FAIL", DEFAULT_ON_FAIL)
+
         for checker in checkers:
             if not get_callable(checker)(username, password, **kwargs):
                 return None
