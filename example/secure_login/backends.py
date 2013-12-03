@@ -4,44 +4,36 @@ from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 
-import os
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DEFAULT_CHECKERS = ["secure_login.checkers.no_weak_passwords",
+                    "secure_login.checkers.no_short_passwords",
+                    "secure_login.checkers.no_username_password_same"]
+
+checkers = getattr(settings, "SECURE_LOGIN_CHECKERS", DEFAULT_CHECKERS)
+
+def get_callable(callable_str):
+    path = callable_str.split(".")
+    module_name = ".".join(path[:-1])
+    callable_name = path[-1]
+    module = __import__(module_name, {}, {}, [callable_name])
+    callable_ = getattr(module, callable_name)
+    return callable_
+
 
 class SecureLoginBackend(backends.ModelBackend):
 
     def __init__(self, *args, **kwargs):
         super(SecureLoginBackend, self).__init__(*args, **kwargs)
-        wordlist = os.path.join(BASE_DIR, "weakpasswords.txt")
-        self.weak_passwords = [el.strip() for el in open(wordlist).read().split()]
+
 
     def authenticate(self, username=None, password=None, **kwargs):
-        if not self.no_weak_passwords(username, password, **kwargs):
-            return None
-        if not self.no_username_password_same(username, password, **kwargs):
-            return None
+        for checker in checkers:
+            if get_callable(checker)(username=None, password=None, **kwargs):
+                return
         user = super(SecureLoginBackend, self).authenticate(username, password, **kwargs)
         if not user: # Login failed
             self.email_user_on_failed_login(username, password, **kwargs)
         return user
 
-
-
-
-    def no_weak_passwords(self, username=None, password=None, **kwargs):
-
-        if password in self.weak_passwords:
-            return False
-        return True
-
-    def no_short_passwords(self, username=None, password=None, **kwargs):
-        if len(password) < getattr(settings, "SECURE_LOGIN_MIN_PASSWORD_LENGTH", 6):
-            return False
-        return True
-
-    def no_username_password_same(self, username=None, password=None, **kwargs):
-        if username == password:
-            return False
-        return True
 
     def email_user_on_failed_login(self, username, password, **kwargs):
         try:
