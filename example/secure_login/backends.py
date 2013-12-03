@@ -22,7 +22,7 @@ def get_callable(callable_str):
 
 class SecureLoginBackendMixin(object):
 
-    def authenticate(self, username=None, password=None, **kwargs):
+    def authenticate1(self, username=None, password=None, **kwargs):
         for checker in checkers:
             if not get_callable(checker)(username, password, **kwargs):
                 return None
