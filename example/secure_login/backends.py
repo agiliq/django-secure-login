@@ -27,8 +27,8 @@ class SecureLoginBackend(backends.ModelBackend):
 
     def authenticate(self, username=None, password=None, **kwargs):
         for checker in checkers:
-            if get_callable(checker)(username=None, password=None, **kwargs):
-                return
+            if not get_callable(checker)(username, password, **kwargs):
+                return None
         user = super(SecureLoginBackend, self).authenticate(username, password, **kwargs)
         if not user: # Login failed
             self.email_user_on_failed_login(username, password, **kwargs)
