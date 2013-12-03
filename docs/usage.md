@@ -23,3 +23,9 @@ And
     ]
 
 `SECURE_LOGIN_CHECKERS` should be a list of callables. Each callable should only return true if it wants the authetication to go through.
+
+And
+
+    SECURE_LOGIN_ON_FAIL = [
+        "secure_login.on_fail.email_user",
+    ]
