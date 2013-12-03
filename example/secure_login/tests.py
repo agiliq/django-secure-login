@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.core import mail
 
 class SecureLoginBackendTest(TestCase):
     def test_no_weak_passwords(self):
@@ -40,3 +41,13 @@ class SecureLoginBackendTest(TestCase):
         user.set_password(good_password)
         user.save()
         self.assertEqual(authenticate(username=username, password=good_password), user)
+
+    def test_email_sent_on_wrong_password(self):
+        username = "hello"
+        password = "hellohello"
+        user = User.objects.create(username=username)
+        user.set_password(password)
+        user.save()
+
+        self.assertFalse(authenticate(username=username, password=password+"1"))
+        self.assertEqual(len(mail.outbox), 1)

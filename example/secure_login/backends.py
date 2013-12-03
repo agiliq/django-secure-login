@@ -1,5 +1,8 @@
 from django.contrib.auth import backends
 from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib.auth.models import User
+from django.template.loader import render_to_string
 
 import os
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -16,7 +19,13 @@ class SecureLoginBackend(backends.ModelBackend):
             return None
         if not self.no_username_password_same(username, password, **kwargs):
             return None
-        return super(SecureLoginBackend, self).authenticate(username, password, **kwargs)
+        user = super(SecureLoginBackend, self).authenticate(username, password, **kwargs)
+        if not user: # Login failed
+            self.email_user_on_failed_login(username, password, **kwargs)
+        return user
+
+
+
 
     def no_weak_passwords(self, username=None, password=None, **kwargs):
 
@@ -33,3 +42,12 @@ class SecureLoginBackend(backends.ModelBackend):
         if username == password:
             return False
         return True
+
+    def email_user_on_failed_login(self, username, password, **kwargs):
+        try:
+            user = User.objects.get(username=username)
+            message = render_to_string("secure_login/failed_login_user.txt")
+            send_mail("failed_login", message, settings.DEFAULT_FROM_EMAIL, [user.email])
+
+        except User.DoesNotExist:
+            pass
