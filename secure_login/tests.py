@@ -10,8 +10,8 @@ class SecureLoginBackendTest(TestCase):
     @override_settings(
         SECURE_LOGIN_CHECKERS=[
             "secure_login.checkers.no_weak_passwords",
-            ]
-        )
+        ]
+    )
     def test_no_weak_passwords(self):
         # import pdb; pdb.set_trace()
         bad_password = "albatross"
@@ -29,8 +29,8 @@ class SecureLoginBackendTest(TestCase):
     @override_settings(
         SECURE_LOGIN_CHECKERS=[
             "secure_login.checkers.no_short_passwords",
-            ]
-        )
+        ]
+    )
     def test_no_short_passwords(self):
         bad_password = "123"
         good_password = "a-l0ng-pa55w0rd-@^&"
@@ -47,8 +47,8 @@ class SecureLoginBackendTest(TestCase):
     @override_settings(
         SECURE_LOGIN_CHECKERS=[
             "secure_login.checkers.no_username_password_same",
-            ]
-        )
+        ]
+    )
     def test_no_username_password_same(self):
         username = "hellohello"
         bad_password = "hellohello"
@@ -67,8 +67,8 @@ class SecureLoginBackendTest(TestCase):
     @override_settings(
         SECURE_LOGIN_CHECKERS=[
             "secure_login.on_fail.email_user",
-            ]
-        )
+        ]
+    )
     def test_email_sent_on_wrong_password(self):
         username = "hello"
         password = "hellohello"
