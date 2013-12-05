@@ -16,7 +16,8 @@ def no_weak_passwords(username=None, password=None, **kwargs):
 
 
 def no_short_passwords(username=None, password=None, **kwargs):
-    if len(password) < getattr(settings, "SECURE_LOGIN_MIN_PASSWORD_LENGTH", 6):
+    if (len(password) <
+            getattr(settings, "SECURE_LOGIN_MIN_PASSWORD_LENGTH", 6)):
         return False
     return True
 
