@@ -57,5 +57,5 @@ class SecureLoginBackendTest(TestCase):
         user.set_password(password)
         user.save()
 
-        self.assertFalse(authenticate(username=username, password=password+"1"))
+        self.assertFalse(authenticate(username=username, password=password + "1"))
         self.assertEqual(len(mail.outbox), 1)
