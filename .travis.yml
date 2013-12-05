@@ -13,10 +13,12 @@ env:
   - DJANGO=https://github.com/django/django/tarball/stable/1.6.x
 
 install:
-  - pip install --use-mirrors $DJANGO
-  - pip install --use-mirrors coverage coveralls
+  - pip install --use-mirrors $DJANGO coverage coveralls pep8
 
 script: coverage run setup.py test
+
+before_script:
+    - pep8 --ignore=E501 secure_login/ example/
 
 after_success: coveralls
 
