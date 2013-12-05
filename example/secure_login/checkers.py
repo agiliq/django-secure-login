@@ -1,7 +1,8 @@
 from django.conf import settings
 
-
 import os
+
+
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 wordlist = os.path.join(BASE_DIR, "weakpasswords.txt")
@@ -13,10 +14,12 @@ def no_weak_passwords(username=None, password=None, **kwargs):
             return False
         return True
 
+
 def no_short_passwords(username=None, password=None, **kwargs):
     if len(password) < getattr(settings, "SECURE_LOGIN_MIN_PASSWORD_LENGTH", 6):
         return False
     return True
+
 
 def no_username_password_same(username=None, password=None, **kwargs):
     if username == password:
