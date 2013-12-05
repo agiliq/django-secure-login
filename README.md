@@ -2,6 +2,7 @@ Django Secure Login
 =======================
 
 [![Build Status](https://travis-ci.org/agiliq/django-secure-login.png?branch=master)](https://travis-ci.org/agiliq/django-secure-login)
+[![Coverage Status](https://coveralls.io/repos/agiliq/django-secure-login/badge.png)](https://coveralls.io/r/agiliq/django-secure-login)
 
 Working
 ---------
