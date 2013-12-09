@@ -79,7 +79,11 @@ class SecureLoginBackendTest(TestCase):
                                       password=password + "1"))
         self.assertEqual(len(mail.outbox), 1)
 
-
+    @override_settings(
+        SECURE_LOGIN_CHECKERS=[
+            "secure_login.checkers.no_weak_passwords",
+        ]
+    )
     def test_email_sent_on_weak_password(self):
         username = "hello"
         password = "hello"
