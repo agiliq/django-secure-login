@@ -13,7 +13,6 @@ class SecureLoginBackendTest(TestCase):
         ]
     )
     def test_no_weak_passwords(self):
-        # import pdb; pdb.set_trace()
         bad_password = "albatross"
         good_password = "a-l0ng-pa55w0rd-@^&"
         user = User.objects.create(username="hello")
