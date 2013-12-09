@@ -25,9 +25,16 @@ class SecureLoginBackendMixin(object):
                                     "SECURE_LOGIN_ON_FAIL",
                                     DEFAULT_ON_FAIL)
 
+        checker_failed = False
         for checker in checkers:
             if not get_callable(checker)(username, password, **kwargs):
-                return None
+                checker_failed = True
+                break
+        if checker_failed:
+            for callable_ in on_fail_callables:
+                get_callable(callable_)(username, password, **kwargs)
+            return None
+
         user = super(SecureLoginBackendMixin, self).authenticate(username,
                                                                  password,
                                                                  **kwargs)

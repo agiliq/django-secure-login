@@ -78,3 +78,16 @@ class SecureLoginBackendTest(TestCase):
         self.assertFalse(authenticate(username=username,
                                       password=password + "1"))
         self.assertEqual(len(mail.outbox), 1)
+
+
+    def test_email_sent_on_weak_password(self):
+        username = "hello"
+        password = "hello"
+        good_password = "a-l0ng-pa55w0rd-@^&"
+        user = User.objects.create(username=username)
+        user.set_password(good_password)
+        user.save()
+
+        self.assertFalse(authenticate(username=username,
+                                      password=password))
+        self.assertEqual(len(mail.outbox), 1)
