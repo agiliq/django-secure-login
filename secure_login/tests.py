@@ -64,7 +64,7 @@ class SecureLoginBackendTest(TestCase):
                                       password=good_password), user)
 
     @override_settings(
-        SECURE_LOGIN_CHECKERS=[
+        SECURE_LOGIN_ON_FAIL=[
             "secure_login.on_fail.email_user",
         ]
     )
