@@ -19,8 +19,8 @@ class SecureLoginBackendMixin(object):
                             "secure_login.checkers.no_username_password_same"]
 
         checkers = getattr(settings, "SECURE_LOGIN_CHECKERS", DEFAULT_CHECKERS)
-
-        DEFAULT_ON_FAIL = ["secure_login.on_fail.email_user",]
+        request = kwargs.pop('request', None)
+        DEFAULT_ON_FAIL = ["secure_login.on_fail.email_user", "secure_login.on_fail.populate_failed_requests"]
         on_fail_callables = getattr(settings, "SECURE_LOGIN_ON_FAIL", DEFAULT_ON_FAIL)
 
         for checker in checkers:

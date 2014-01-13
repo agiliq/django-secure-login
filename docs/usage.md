@@ -28,4 +28,5 @@ And
 
     SECURE_LOGIN_ON_FAIL = [
         "secure_login.on_fail.email_user",
+        "secure_login.on_fail.populate_failed_requests",
     ]
