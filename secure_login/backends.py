@@ -14,14 +14,26 @@ class SecureLoginBackendMixin(object):
 
         checkers = getattr(settings, "SECURE_LOGIN_CHECKERS", DEFAULT_CHECKERS)
         request = kwargs.pop('request', None)
-        DEFAULT_ON_FAIL = ["secure_login.on_fail.email_user", "secure_login.on_fail.populate_failed_requests"]
-        on_fail_callables = getattr(settings, "SECURE_LOGIN_ON_FAIL", DEFAULT_ON_FAIL)
 
+        DEFAULT_ON_FAIL = ["secure_login.on_fail.email_user", ]
+        on_fail_callables = getattr(settings,
+                                    "SECURE_LOGIN_ON_FAIL",
+                                    DEFAULT_ON_FAIL)
+
+        checker_failed = False
         for checker in checkers:
             if not get_callable(checker)(username, password, **kwargs):
-                return None
-        user = super(SecureLoginBackendMixin, self).authenticate(username, password, **kwargs)
-        if not user: # Login failed
+                checker_failed = True
+                break
+        if checker_failed:
+            for callable_ in on_fail_callables:
+                get_callable(callable_)(username, password, **kwargs)
+            return None
+
+        user = super(SecureLoginBackendMixin, self).authenticate(username,
+                                                                 password,
+                                                                 **kwargs)
+        if not user:  # Login failed
             for callable_ in on_fail_callables:
                 get_callable(callable_)(username, password, **kwargs)
         return user
