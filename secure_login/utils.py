@@ -1,5 +1,6 @@
 from django.conf import settings
 
+
 def get_callable(callable_str):
     path = callable_str.split(".")
     module_name = ".".join(path[:-1])

@@ -90,7 +90,6 @@ class SecureLoginBackendTest(TestCase):
         user_ = authenticate(username=username, password=password)
         self.assertFalse(user_.is_active)
 
-
     def test_email_based_backend(self):
 
         username = "hello"
@@ -98,14 +97,11 @@ class SecureLoginBackendTest(TestCase):
         email = "hello@example.com"
         user = User.objects.create_user(username=username, password=password, email=email)
 
-
         with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend"], SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords"]):
             self.assertEqual(authenticate(email=email, password=password), None)
 
         with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend"], SECURE_LOGIN_CHECKERS=[]):
             self.assertEqual(authenticate(email=email, password=password), user)
-
-
 
 
 class FormsTest(TestCase):
@@ -209,6 +205,7 @@ class EmailBackend(object):
             return User.objects.get(email=email)
         except User.DoesNotexist:
             return None
+
 
 class SecureEmailBackend(SecureLoginBackendMixin, EmailBackend):
     def username_fieldname(self):

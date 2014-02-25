@@ -50,6 +50,5 @@ class SecureLoginBackendMixin(object):
         return handle_fieldname(self.username_fieldname(), self.password_fieldname(), checker_)
 
 
-
 class SecureLoginBackend(SecureLoginBackendMixin, backends.ModelBackend):
     pass
