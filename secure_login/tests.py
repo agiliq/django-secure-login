@@ -160,3 +160,26 @@ class FormsTest(TestCase):
             form = SecureRegisterForm(
                 data={"username": "hello", "password": bad_password})
             self.assertTrue(form.is_valid())
+
+    def test_email_login_form(self):
+        class EmailLoginForm(forms.Form):
+            email = forms.EmailField()
+            password = forms.CharField()
+
+        class SecureRegisterForm(SecureFormMixin, EmailLoginForm):
+            pass
+
+            def username_fieldname(self):
+                return "email"
+
+        bad_password = "albatross"
+
+        with self.settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords", ]):
+            form = SecureRegisterForm(
+                data={"email": "hello@example.com", "password": bad_password})
+            self.assertFalse(form.is_valid())
+
+        with self.settings(SECURE_LOGIN_CHECKERS=[]):
+            form = SecureRegisterForm(
+                data={"email": "hello@example.com", "password": bad_password})
+            self.assertTrue(form.is_valid())

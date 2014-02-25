@@ -2,4 +2,5 @@
 db.sqlite3
 htmlcov/
 *.egg
+dist/
 django_secure_login.egg-info/
