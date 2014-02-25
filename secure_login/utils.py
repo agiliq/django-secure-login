@@ -12,9 +12,9 @@ def get_callable(callable_str):
 
 def handle_fieldname(username_field, password_field, func):
     def deco(**kwargs):
-        username = kwargs[username_field]
-        password = kwargs[password_field]
-        del kwargs[username_field]
-        del kwargs[password_field]
+        username = kwargs.get(username_field)
+        password = kwargs.get(password_field)
+        if username: del kwargs[username_field]
+        if password: del kwargs[password_field]
         return func(username, password, **kwargs)
     return deco

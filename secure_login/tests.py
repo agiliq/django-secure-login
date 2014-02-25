@@ -5,6 +5,7 @@ from django.core import mail
 from django.test.utils import override_settings
 from django.conf import settings
 from django import forms
+from django.contrib.auth.backends import ModelBackend
 
 from .models import FailedLogin
 from .forms import SecureLoginForm, SecureFormMixin
@@ -103,6 +104,15 @@ class SecureLoginBackendTest(TestCase):
         with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend"], SECURE_LOGIN_CHECKERS=[]):
             self.assertEqual(authenticate(email=email, password=password), user)
 
+
+    def test_multiple_backend(self):
+        username = "hello"
+        password = "albatross"
+        email = "hello@example.com"
+        user = User.objects.create_user(username=username, password=password, email=email)
+
+        with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend", "secure_login.tests.SecureUsernameBackend"], SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords"]):
+            self.assertEqual(authenticate(email=email, password=password), None)
 
 class FormsTest(TestCase):
 
@@ -210,3 +220,6 @@ class EmailBackend(object):
 class SecureEmailBackend(SecureLoginBackendMixin, EmailBackend):
     def username_fieldname(self):
         return "email"
+
+class SecureUsernameBackend(SecureLoginBackendMixin, ModelBackend):
+    pass
