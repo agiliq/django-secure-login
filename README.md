@@ -21,6 +21,7 @@ Settings
 Features
 ---------
 
+* Works with any Backend and Form which has usename-y and password-y attributes.
 * Ensure that passwords have a minimum length (default 6)
 * Ensure that the password is not in the list of known weak passwords.
 * Ensure username is not same as password
