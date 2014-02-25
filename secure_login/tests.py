@@ -8,6 +8,7 @@ from django import forms
 
 from .models import FailedLogin
 from .forms import SecureLoginForm, SecureFormMixin
+from .backends import SecureLoginBackendMixin
 
 
 class SecureLoginBackendTest(TestCase):
@@ -89,6 +90,19 @@ class SecureLoginBackendTest(TestCase):
         user_ = authenticate(username=username, password=password)
         self.assertFalse(user_.is_active)
 
+    def test_email_based_backend(self):
+
+        username = "hello"
+        password = "albatross"
+        email = "hello@example.com"
+        user = User.objects.create_user(username=username, password=password, email=email)
+
+        with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend"], SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords"]):
+            self.assertEqual(authenticate(email=email, password=password), None)
+
+        with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend"], SECURE_LOGIN_CHECKERS=[]):
+            self.assertEqual(authenticate(email=email, password=password), user)
+
 
 class FormsTest(TestCase):
 
@@ -160,3 +174,39 @@ class FormsTest(TestCase):
             form = SecureRegisterForm(
                 data={"username": "hello", "password": bad_password})
             self.assertTrue(form.is_valid())
+
+    def test_email_login_form(self):
+        class EmailLoginForm(forms.Form):
+            email = forms.EmailField()
+            password = forms.CharField()
+
+        class SecureRegisterForm(SecureFormMixin, EmailLoginForm):
+            pass
+
+            def username_fieldname(self):
+                return "email"
+
+        bad_password = "albatross"
+
+        with self.settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords", ]):
+            form = SecureRegisterForm(
+                data={"email": "hello@example.com", "password": bad_password})
+            self.assertFalse(form.is_valid())
+
+        with self.settings(SECURE_LOGIN_CHECKERS=[]):
+            form = SecureRegisterForm(
+                data={"email": "hello@example.com", "password": bad_password})
+            self.assertTrue(form.is_valid())
+
+
+class EmailBackend(object):
+    def authenticate(self, email, password, **kwargs):
+        try:
+            return User.objects.get(email=email)
+        except User.DoesNotexist:
+            return None
+
+
+class SecureEmailBackend(SecureLoginBackendMixin, EmailBackend):
+    def username_fieldname(self):
+        return "email"

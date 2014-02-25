@@ -2,12 +2,12 @@ from django.contrib.auth import backends
 from django.conf import settings
 
 
-from .utils import get_callable
+from .utils import get_callable, handle_fieldname
 
 
 class SecureLoginBackendMixin(object):
 
-    def authenticate(self, username=None, password=None, **kwargs):
+    def authenticate(self, **kwargs):
         DEFAULT_CHECKERS = ["secure_login.checkers.no_weak_passwords",
                             "secure_login.checkers.no_short_passwords",
                             "secure_login.checkers.no_username_password_same"]
@@ -22,21 +22,32 @@ class SecureLoginBackendMixin(object):
 
         checker_failed = False
         for checker in checkers:
-            if not get_callable(checker)(username, password, **kwargs):
+            checker_ = self.get_final_callable(checker)
+            if not checker_(**kwargs):
                 checker_failed = True
                 break
         if checker_failed:
             for callable_ in on_fail_callables:
-                get_callable(callable_)(username, password, **kwargs)
+                self.get_final_callable(callable_)(**kwargs)
             return None
 
-        user = super(SecureLoginBackendMixin, self).authenticate(username,
-                                                                 password,
-                                                                 **kwargs)
+        user = super(SecureLoginBackendMixin, self).authenticate(**kwargs)
+
         if not user:  # Login failed
             for callable_ in on_fail_callables:
-                get_callable(callable_)(username, password, **kwargs)
+                callable_ = self.get_final_callable(callable_)
+                callable_(**kwargs)
         return user
+
+    def username_fieldname(self):
+        return "username"
+
+    def password_fieldname(self):
+        return "password"
+
+    def get_final_callable(self, checker):
+        checker_ = get_callable(checker)
+        return handle_fieldname(self.username_fieldname(), self.password_fieldname(), checker_)
 
 
 class SecureLoginBackend(SecureLoginBackendMixin, backends.ModelBackend):
