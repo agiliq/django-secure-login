@@ -4,7 +4,21 @@ Django Secure Login
 [![Build Status](https://travis-ci.org/agiliq/django-secure-login.png?branch=master)](https://travis-ci.org/agiliq/django-secure-login)
 [![Coverage Status](https://coveralls.io/repos/agiliq/django-secure-login/badge.png)](https://coveralls.io/r/agiliq/django-secure-login)
 
-Working
+Overview
+------------
+Django secure login provides utilities to add simple security steps around login and registration. It provides two mixins, `SecureLoginBackendMixin` and `SecureFormMixin` which check for common vulnerabilities while logging in.
+
+* `SecureLoginBackendMixin` can be used with any Backend which has a concept of username and password
+* `SecureFormMixin` can be used with any Form which has a concept of username and password. (eg login form, registration form etc)
+
+Settings
+-----------
+
+* `SECURE_LOGIN_CHECKERS`: A list of strings which can be evaluated to callables. The callable should return True if it wants the authentication to go through.
+* `SECURE_LOGIN_ON_FAIL`: A list of strings which can be evaluated to callables. Can take any action appropriate to a failed login.
+* `SECURE_LOGIN_MAX_HOURLY_ATTEMPTS`: Max failed attempts per hour before the user is locked out.
+
+Features
 ---------
 
 * Ensure that passwords have a minimum length (default 6)
@@ -12,6 +26,60 @@ Working
 * Ensure username is not same as password
 * Email user on a failed login attempt for them.
 * Lockout after 10 failed attemps within an hour.
+
+Usage
+-----------
+
+
+Simple
+===========
+
+Set
+
+    AUTHENTICATION_BACKENDS = ("secure_login.backends.SecureLoginBackend", )
+
+Which will run all the default checkers.
+
+Advanced
+===========
+
+    AUTHENTICATION_BACKENDS = ("secure_login.backends.SecureLoginBackend", )
+
+And
+
+    SECURE_LOGIN_CHECKERS = [
+        "secure_login.checkers.no_weak_passwords",
+        "secure_login.checkers.no_short_passwords",
+    ]
+
+`SECURE_LOGIN_CHECKERS` should be a list of callables. Each callable should only return true if it wants the authentication to go through.
+
+And
+
+    SECURE_LOGIN_ON_FAIL = [
+        "secure_login.on_fail.email_user",
+        "secure_login.on_fail.populate_failed_requests",
+    ]
+
+`SECURE_LOGIN_ON_FAIL` should be a list of callables. Each callable would be called in order if the authentication falls.
+
+Writing new secure backends.
+=================================
+
+If you have an existing backend `FooBackend`, you can add SecureBackend like this.
+
+    class SecureFooLoginBackend(SecureLoginBackendMixin, FooBackend):
+        pass
+
+
+Secure Form
+============
+
+Use the `SecureFormMixin` with your usual forms. The forms must have username and password fields.
+
+`SECURE_LOGIN_CHECKERS` will be tested in the the clean method.
+
+
 
 TODO
 ---------
