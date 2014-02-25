@@ -2,13 +2,7 @@ from django.contrib.auth import backends
 from django.conf import settings
 
 
-def get_callable(callable_str):
-    path = callable_str.split(".")
-    module_name = ".".join(path[:-1])
-    callable_name = path[-1]
-    module = __import__(module_name, {}, {}, [callable_name])
-    callable_ = getattr(module, callable_name)
-    return callable_
+from .utils import get_callable
 
 
 class SecureLoginBackendMixin(object):
@@ -19,6 +13,7 @@ class SecureLoginBackendMixin(object):
                             "secure_login.checkers.no_username_password_same"]
 
         checkers = getattr(settings, "SECURE_LOGIN_CHECKERS", DEFAULT_CHECKERS)
+        request = kwargs.pop('request', None)
 
         DEFAULT_ON_FAIL = ["secure_login.on_fail.email_user", ]
         on_fail_callables = getattr(settings,

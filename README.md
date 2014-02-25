@@ -11,13 +11,13 @@ Working
 * Ensure that the password is not in the list of known weak passwords.
 * Ensure username is not same as password
 * Email user on a failed login attempt for them.
+* Lockout after 10 failed attemps within an hour.
 
 TODO
 ---------
 
 * Rate limits login attempts per IP.
 * Rate limits login attempts per user.
-* Lockout after X failed attemps.
 * Emails admins on X failed attempts.
 * Integrate with fail2ban.
 * Support 2F authentication
