@@ -104,7 +104,6 @@ class SecureLoginBackendTest(TestCase):
         with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend"], SECURE_LOGIN_CHECKERS=[]):
             self.assertEqual(authenticate(email=email, password=password), user)
 
-
     def test_multiple_backend(self):
         username = "hello"
         password = "albatross"
@@ -113,6 +112,7 @@ class SecureLoginBackendTest(TestCase):
 
         with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend", "secure_login.tests.SecureUsernameBackend"], SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords"]):
             self.assertEqual(authenticate(email=email, password=password), None)
+
 
 class FormsTest(TestCase):
 
@@ -220,6 +220,7 @@ class EmailBackend(object):
 class SecureEmailBackend(SecureLoginBackendMixin, EmailBackend):
     def username_fieldname(self):
         return "email"
+
 
 class SecureUsernameBackend(SecureLoginBackendMixin, ModelBackend):
     pass
