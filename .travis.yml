@@ -4,13 +4,17 @@ python:
   - 2.7
   - 3.3
 
+cache:
+  directories:
+    - $HOME/.pip-cache/
+
 env:
   - DJANGO=Django==1.4.2
   - DJANGO=Django==1.5.5
   - DJANGO=https://github.com/django/django/tarball/stable/1.6.x
 
 install:
-  - pip install --use-mirrors $DJANGO coverage coveralls pep8
+  - pip install --use-mirrors $DJANGO coverage coveralls pep8 --download-cache $HOME/.pip-cache
 
 script: coverage run setup.py test
 
