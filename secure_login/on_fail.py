@@ -20,6 +20,7 @@ def email_user(username, password, **kwargs):
     except User.DoesNotExist:
         pass
 
+
 def populate_failed_requests(username, password, **kwargs):
     request = kwargs.get("request")
     if request and get_client_ip(request):
@@ -46,8 +47,6 @@ def lockout_on_many_wrong_password(username, password, **kwargs):
         pass
 
 
-
-
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     ip = None
@@ -56,4 +55,3 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
-

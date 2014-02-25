@@ -6,6 +6,7 @@ from .utils import get_callable
 
 DEFAULT_ERROR_MESSAGE = "Please review the username and password"
 
+
 class SecureFormMixin(object):
 
     def clean(self):
@@ -19,6 +20,7 @@ class SecureFormMixin(object):
             if not checker_(**self.cleaned_data):
                 raise forms.ValidationError(getattr(checker_, "error_message", DEFAULT_ERROR_MESSAGE))
         return super(SecureFormMixin, self).clean()
+
 
 class SecureLoginForm(SecureFormMixin, AuthenticationForm):
     pass
