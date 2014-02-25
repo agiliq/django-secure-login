@@ -25,7 +25,7 @@ Features
 * Ensure that the password is not in the list of known weak passwords.
 * Ensure username is not same as password
 * Email user on a failed login attempt for them.
-* Lockout after 10 failed attemps within an hour.
+* Lockout after 10 failed attempts within an hour.
 
 Usage
 -----------
