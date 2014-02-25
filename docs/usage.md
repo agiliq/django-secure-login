@@ -42,5 +42,10 @@ If you have an existing backend `FooBackend`, you can add SecureBackend like thi
         pass
 
 
+Secure Form
+-----------------
 
+Use the `SecureFormMixin` with your usual forms. The forms must have username and password fields.
+
+`SECURE_LOGIN_CHECKERS` will be tested in the the clean method.
 

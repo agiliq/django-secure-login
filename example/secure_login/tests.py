@@ -5,11 +5,13 @@ from django.core import mail
 from django.test.utils import override_settings
 from django.conf import settings
 
+from .models import FailedLogin
+from .forms import SecureLoginForm
+
 class SecureLoginBackendTest(TestCase):
 
     @override_settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords",])
     def test_no_weak_passwords(self):
-        # import pdb; pdb.set_trace()
         bad_password = "albatross"
         good_password = "a-l0ng-pa55w0rd-@^&"
         user = User.objects.create(username="hello")
@@ -59,3 +61,59 @@ class SecureLoginBackendTest(TestCase):
 
         self.assertFalse(authenticate(username=username, password=password+"1"))
         self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(SECURE_LOGIN_ON_FAIL=["secure_login.on_fail.populate_failed_requests"], SECURE_LOGIN_CHECKERS=[])
+    def test_populate_failed_requests(self):
+        username = "hello"
+        password = "hellohello"
+        user = User.objects.create_user(username=username, password=password)
+
+        authenticate(username=username, password="not-the-correct-password")
+        self.assertEqual(FailedLogin.objects.count(), 1)
+
+    @override_settings(SECURE_LOGIN_ON_FAIL=["secure_login.on_fail.populate_failed_requests", "secure_login.on_fail.lockout_on_many_wrong_password",], SECURE_LOGIN_CHECKERS=[])
+    def test_lockout(self):
+        username = "hello"
+        password = "hellohello"
+        user = User.objects.create_user(username=username, password=password)
+
+        for _ in range(11):
+            authenticate(username=username, password="not-the-correct-password")
+        user_ = authenticate(username=username, password=password)
+        self.assertFalse(user_.is_active)
+
+class FormsTest(TestCase):
+
+    def test_no_weak_passwords(self):
+        bad_password = "albatross"
+        good_password = "a-l0ng-pa55w0rd-@^&"
+
+        user = User.objects.create(username="hello")
+        user.set_password(bad_password)
+        user.save()
+
+        form = SecureLoginForm(data={"username": "hello", "password": bad_password})
+        self.assertFalse(form.is_valid())
+
+        user.set_password(good_password)
+        user.save()
+        form = SecureLoginForm(data={"username": "hello", "password": good_password})
+        self.assertTrue(form.is_valid())
+
+    @override_settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_short_passwords",])
+    def test_no_short_passwords(self):
+        bad_password = "123"
+        good_password = "a-l0ng-pa55w0rd-@^&"
+        user = User.objects.create(username="hello")
+        user.set_password(bad_password)
+        user.save()
+        form = SecureLoginForm(data={"username": "hello", "password": bad_password})
+
+        self.assertFalse(form.is_valid())
+
+        user.set_password(good_password)
+        user.save()
+        form = SecureLoginForm(data={"username": "hello", "password": good_password})
+        self.assertTrue(form.is_valid())
+
+
