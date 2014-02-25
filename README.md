@@ -71,11 +71,31 @@ If you have an existing backend `FooBackend`, you can add SecureBackend like thi
     class SecureFooLoginBackend(SecureLoginBackendMixin, FooBackend):
         pass
 
+If this backend has `email` as an username like identifier.
+
+    class SecureFooLoginBackend(SecureLoginBackendMixin, FooBackend):
+
+        def username_fieldname(self):
+            return "email"
+
+
 
 Secure Form
 ============
 
-Use the `SecureFormMixin` with your usual forms. The forms must have username and password fields.
+Use the `SecureFormMixin` with your usual forms. If you have an existing for `FooForm`
+
+    class SecureFooForm(SecureFormMixin, FooForm):
+        pass
+
+If this form uses email as username lke identifier
+
+    class SecureFooForm(SecureFormMixin, FooForm):
+
+        def username_fieldname(self):
+            return "email"
+
+
 
 `SECURE_LOGIN_CHECKERS` will be tested in the the clean method.
 
