@@ -4,9 +4,10 @@ from django.contrib.auth import authenticate
 from django.core import mail
 from django.test.utils import override_settings
 from django.conf import settings
+from django import forms
 
 from .models import FailedLogin
-from .forms import SecureLoginForm
+from .forms import SecureLoginForm, SecureFormMixin
 
 class SecureLoginBackendTest(TestCase):
 
@@ -84,6 +85,7 @@ class SecureLoginBackendTest(TestCase):
 
 class FormsTest(TestCase):
 
+    @override_settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords",])
     def test_no_weak_passwords(self):
         bad_password = "albatross"
         good_password = "a-l0ng-pa55w0rd-@^&"
@@ -116,4 +118,31 @@ class FormsTest(TestCase):
         form = SecureLoginForm(data={"username": "hello", "password": good_password})
         self.assertTrue(form.is_valid())
 
+    def test_register_form(self):
+        class RegiterForm(forms.Form):
+            username = forms.CharField(max_length=50)
+            password = forms.CharField()
+            email = forms.EmailField(required=False)
 
+
+        class SecureRegisterForm(SecureFormMixin, RegiterForm):
+            pass
+
+        bad_password = "albatross"
+
+        with self.settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords",]):
+            form = SecureRegisterForm(data={"username": "hello", "password": bad_password})
+            self.assertFalse(form.is_valid())
+
+        with self.settings(SECURE_LOGIN_CHECKERS=[]):
+            form = SecureRegisterForm(data={"username": "hello", "password": bad_password})
+            self.assertTrue(form.is_valid())
+
+        bad_password = 123
+        with self.settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_short_passwords",]):
+            form = SecureRegisterForm(data={"username": "hello", "password": bad_password})
+            self.assertFalse(form.is_valid())
+
+        with self.settings(SECURE_LOGIN_CHECKERS=[]):
+            form = SecureRegisterForm(data={"username": "hello", "password": bad_password})
+            self.assertTrue(form.is_valid())
