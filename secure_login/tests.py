@@ -32,10 +32,15 @@ class SecureLoginBackendTest(TestCase):
     def test_no_short_passwords(self):
         bad_password = "123"
         good_password = "a-l0ng-pa55w0rd-@^&"
+        empty_password = ''
         user = User.objects.create(username="hello")
         user.set_password(bad_password)
         user.save()
         self.assertFalse(authenticate(username="hello", password=bad_password))
+
+        user.set_password(empty_password)
+        user.save()
+        self.assertFalse(authenticate(username="hello", password=empty_password))
 
         user.set_password(good_password)
         user.save()
@@ -139,12 +144,19 @@ class FormsTest(TestCase):
     def test_no_short_passwords(self):
         bad_password = "123"
         good_password = "a-l0ng-pa55w0rd-@^&"
+        empty_password = ''
         user = User.objects.create(username="hello")
         user.set_password(bad_password)
         user.save()
         form = SecureLoginForm(
             data={"username": "hello", "password": bad_password})
 
+        self.assertFalse(form.is_valid())
+
+        user.set_password(empty_password)
+        user.save()
+        form = SecureLoginForm(
+            data={"username": "hello", "password": empty_password})
         self.assertFalse(form.is_valid())
 
         user.set_password(good_password)
@@ -184,6 +196,12 @@ class FormsTest(TestCase):
             form = SecureRegisterForm(
                 data={"username": "hello", "password": bad_password})
             self.assertTrue(form.is_valid())
+
+        bad_password = ''
+        with self.settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_short_passwords", ]):
+            form = SecureRegisterForm(
+                data={"username": "hello", "password": bad_password})
+            self.assertFalse(form.is_valid())
 
     def test_email_login_form(self):
         class EmailLoginForm(forms.Form):
