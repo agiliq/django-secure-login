@@ -9,7 +9,7 @@ from django.contrib.auth.backends import ModelBackend
 
 from .models import FailedLogin
 from .forms import SecureLoginForm, SecureFormMixin
-import checkers
+import secure_login.checkers as checkers
 from .backends import SecureLoginBackendMixin
 
 
