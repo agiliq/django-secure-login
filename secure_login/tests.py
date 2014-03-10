@@ -9,6 +9,7 @@ from django.contrib.auth.backends import ModelBackend
 
 from .models import FailedLogin
 from .forms import SecureLoginForm, SecureFormMixin
+import secure_login.checkers as checkers
 from .backends import SecureLoginBackendMixin
 
 
@@ -123,6 +124,8 @@ class FormsTest(TestCase):
 
     @override_settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords", ])
     def test_no_weak_passwords(self):
+        checkers.no_weak_passwords.error_message = 'Your password is too weak'
+
         bad_password = "albatross"
         good_password = "a-l0ng-pa55w0rd-@^&"
 
@@ -133,6 +136,7 @@ class FormsTest(TestCase):
         form = SecureLoginForm(
             data={"username": "hello", "password": bad_password})
         self.assertFalse(form.is_valid())
+        self.assertIn(checkers.no_weak_passwords.error_message, form.errors['__all__'])
 
         user.set_password(good_password)
         user.save()
@@ -142,6 +146,8 @@ class FormsTest(TestCase):
 
     @override_settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_short_passwords", ])
     def test_no_short_passwords(self):
+        checkers.no_short_passwords.error_message = 'Your password is too short'
+
         bad_password = "123"
         good_password = "a-l0ng-pa55w0rd-@^&"
         empty_password = ''
@@ -152,6 +158,7 @@ class FormsTest(TestCase):
             data={"username": "hello", "password": bad_password})
 
         self.assertFalse(form.is_valid())
+        self.assertIn(checkers.no_short_passwords.error_message, form.errors['__all__'])
 
         user.set_password(empty_password)
         user.save()

@@ -16,10 +16,10 @@ class SecureFormMixin(object):
 
         checkers = getattr(settings, "SECURE_LOGIN_CHECKERS", DEFAULT_CHECKERS)
         for checker in checkers:
-            checker_ = get_callable(checker)
-            checker_ = handle_fieldname(self.username_fieldname(), self.password_fieldname(), checker_)
+            callable_checker_ = get_callable(checker)
+            checker_ = handle_fieldname(self.username_fieldname(), self.password_fieldname(), callable_checker_)
             if not checker_(**self.cleaned_data):
-                raise forms.ValidationError(getattr(checker_, "error_message", DEFAULT_ERROR_MESSAGE))
+                raise forms.ValidationError(getattr(callable_checker_, "error_message", DEFAULT_ERROR_MESSAGE))
         return super(SecureFormMixin, self).clean()
 
     def username_fieldname(self):
