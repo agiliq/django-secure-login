@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-
+import django
+django.setup()
 import sys
 import os
 from os.path import dirname, abspath
@@ -29,15 +30,15 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
         STATIC_URL = "/static/",
     )
 
-from django.test.simple import DjangoTestSuiteRunner
-
+# from django.test.simple import DjangoTestSuiteRunner
+from django.test.runner import DiscoverRunner
 
 def runtests(*test_args, **kwargs):
     if not test_args:
         test_args = ['secure_login']
     parent = dirname(abspath(__file__))
     sys.path.insert(0, parent)
-    test_runner = DjangoTestSuiteRunner(
+    test_runner = DiscoverRunner(
         verbosity=kwargs.get('verbosity', 1),
         interactive=kwargs.get('interactive', False),
         failfast=kwargs.get('failfast'))
