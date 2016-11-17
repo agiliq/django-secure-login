@@ -12,7 +12,7 @@ env:
   - DJANGO=Django==1.10
 
 install:
-  - pip install --use-mirrors $DJANGO coverage coveralls pep8 --download-cache $HOME/.pip-cache
+  - pip install $DJANGO coverage coveralls pep8 $HOME/.pip-cache
 
 script: coverage run setup.py test
 
