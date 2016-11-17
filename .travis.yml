@@ -17,7 +17,7 @@ install:
 script: coverage run setup.py test
 
 before_script:
-    - pep8 --ignore=E501 secure_login/
+    - export DJANGO_SETTINGS_MODULE="secure_login.settings"
 
 after_success: coveralls
 
