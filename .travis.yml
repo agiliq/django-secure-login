@@ -12,7 +12,7 @@ env:
   - DJANGO=Django==1.10
 
 install:
-  - pip install $DJANGO coverage coveralls pep8 $HOME/.pip-cache
+  - "pip install -r requirements.txt"
 
 script: coverage run setup.py test
 
