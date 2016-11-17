@@ -12,6 +12,10 @@ from django.conf import settings
 # haven't been provided settings to use by environment variable.
 if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
     settings.configure(
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+
+        SECRET_KEY = '0c2_x_ixxb1wg%7y2_-=mx-03(h)=327_9uc8b-gvuew2*#o!%',
+
         DATABASES={
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
@@ -28,6 +32,32 @@ if not settings.configured and not os.environ.get('DJANGO_SETTINGS_MODULE'):
             'secure_login',
         ],
         STATIC_URL = "/static/",
+        TEMPLATES = [
+            {
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                # 'DIRS': [
+                #     os.path.join(BASE_DIR,"templates"),
+                # ],
+                'APP_DIRS': True,
+                'OPTIONS': {
+                    'context_processors': [
+                        'django.template.context_processors.debug',
+                        'django.template.context_processors.request',
+                        'django.contrib.auth.context_processors.auth',
+                        'django.contrib.messages.context_processors.messages',
+                    ],
+                },
+            },
+        ],
+        LANGUAGE_CODE = 'en-us',
+
+        TIME_ZONE = 'UTC',
+
+        USE_I18N = True,
+
+        USE_L10N = True,
+
+        USE_TZ = False,
     )
 
 # from django.test.simple import DjangoTestSuiteRunner
