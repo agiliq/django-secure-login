@@ -2,7 +2,9 @@ language: python
 
 python:
   - 2.7
+  - 3.3
   - 3.4
+  - 3.5
 
 cache:
   directories:
@@ -21,7 +23,8 @@ before_script:
 
 after_success: coveralls
 
+# For excluding any combinations which won't work, for example django 1.10 is not feasible with python 3.3.
 matrix:
   exclude:
    - python: 3.3
-     env: DJANGO=Django==1.4.2
+     env: DJANGO=Django==1.10
