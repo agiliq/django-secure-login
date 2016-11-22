@@ -42,7 +42,8 @@ class SecureLoginBackendTest(TestCase):
 
         user.set_password(empty_password)
         user.save()
-        self.assertFalse(authenticate(username="hello", password=empty_password))
+        self.assertFalse(authenticate(
+            username="hello", password=empty_password))
 
         user.set_password(good_password)
         user.save()
@@ -87,7 +88,6 @@ class SecureLoginBackendTest(TestCase):
         self.assertEqual(FailedLogin.objects.count(), 1)
 
     @override_settings(SECURE_LOGIN_ON_FAIL=["secure_login.on_fail.populate_failed_requests", "secure_login.on_fail.lockout_on_many_wrong_password", ], SECURE_LOGIN_CHECKERS=[])
-    
     def test_lockout(self):
         username = "hello"
         password = "hellohello@1"
@@ -96,7 +96,8 @@ class SecureLoginBackendTest(TestCase):
             authenticate(
                 username=username, password="not-the-correct-password")
         authenticate_inactive = AllowAllUsersModelBackend()
-        user_ = authenticate_inactive.authenticate(username=username,password=password)
+        user_ = authenticate_inactive.authenticate(
+            username=username, password=password)
         self.assertFalse(user_.is_active)
 
     def test_email_based_backend(self):
@@ -104,22 +105,27 @@ class SecureLoginBackendTest(TestCase):
         username = "hello"
         password = "albatross"
         email = "hello@example.com"
-        user = User.objects.create_user(username=username, password=password, email=email)
+        user = User.objects.create_user(
+            username=username, password=password, email=email)
 
         with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend"], SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords"]):
-            self.assertEqual(authenticate(email=email, password=password), None)
+            self.assertEqual(authenticate(
+                email=email, password=password), None)
 
         with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend"], SECURE_LOGIN_CHECKERS=[]):
-            self.assertEqual(authenticate(email=email, password=password), user)
+            self.assertEqual(authenticate(
+                email=email, password=password), user)
 
     def test_multiple_backend(self):
         username = "hello"
         password = "albatross"
         email = "hello@example.com"
-        user = User.objects.create_user(username=username, password=password, email=email)
+        user = User.objects.create_user(
+            username=username, password=password, email=email)
 
         with self.settings(AUTHENTICATION_BACKENDS=["secure_login.tests.SecureEmailBackend", "secure_login.tests.SecureUsernameBackend"], SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_weak_passwords"]):
-            self.assertEqual(authenticate(email=email, password=password), None)
+            self.assertEqual(authenticate(
+                email=email, password=password), None)
 
 
 class FormsTest(TestCase):
@@ -138,7 +144,8 @@ class FormsTest(TestCase):
         form = SecureLoginForm(
             data={"username": "hello", "password": bad_password})
         self.assertFalse(form.is_valid())
-        self.assertIn(checkers.no_weak_passwords.error_message, form.errors['__all__'])
+        self.assertIn(checkers.no_weak_passwords.error_message,
+                      form.errors['__all__'])
 
         user.set_password(good_password)
         user.save()
@@ -160,7 +167,8 @@ class FormsTest(TestCase):
             data={"username": "hello", "password": bad_password})
 
         self.assertFalse(form.is_valid())
-        self.assertIn(checkers.no_short_passwords.error_message, form.errors['__all__'])
+        self.assertIn(checkers.no_short_passwords.error_message,
+                      form.errors['__all__'])
 
         user.set_password(empty_password)
         user.save()
@@ -237,6 +245,7 @@ class FormsTest(TestCase):
 
 
 class EmailBackend(object):
+
     def authenticate(self, email, password, **kwargs):
         try:
             return User.objects.get(email=email)
@@ -245,6 +254,7 @@ class EmailBackend(object):
 
 
 class SecureEmailBackend(SecureLoginBackendMixin, EmailBackend):
+
     def username_fieldname(self):
         return "email"
 
