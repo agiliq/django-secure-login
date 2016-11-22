@@ -16,7 +16,7 @@ def handle_fieldname(username_field, password_field, func):
         password = kwargs.get(password_field)
         if username:
             del kwargs[username_field]
-        if password:
+        if password is not None:
             del kwargs[password_field]
         return func(username, password, **kwargs)
     return deco

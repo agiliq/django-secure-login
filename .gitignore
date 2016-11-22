@@ -4,4 +4,4 @@ htmlcov/
 *.egg
 dist/
 django_secure_login.egg-info/
-settings.py
+.idea/

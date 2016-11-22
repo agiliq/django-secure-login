@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.contrib.auth.backends import AllowAllUsersModelBackend
 from django.core import mail
 from django.test.utils import override_settings
 from django.conf import settings
@@ -29,24 +30,24 @@ class SecureLoginBackendTest(TestCase):
         self.assertEqual(
             authenticate(username="hello", password=good_password), user)
 
-    # @override_settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_short_passwords", ])
-    # def test_no_short_passwords(self):
-    #     bad_password = "123"
-    #     good_password = "a-l0ng-pa55w0rd-@^&"
-    #     empty_password = ''
-    #     user = User.objects.create(username="hello")
-    #     user.set_password(bad_password)
-    #     user.save()
-    #     self.assertFalse(authenticate(username="hello", password=bad_password))
+    @override_settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_short_passwords", ])
+    def test_no_short_passwords(self):
+        bad_password = "123"
+        good_password = "a-l0ng-pa55w0rd-@^&"
+        empty_password = ''
+        user = User.objects.create(username="hello")
+        user.set_password(bad_password)
+        user.save()
+        self.assertFalse(authenticate(username="hello", password=bad_password))
 
-    #     user.set_password(empty_password)
-    #     user.save()
-    #     self.assertFalse(authenticate(username="hello", password=empty_password))
+        user.set_password(empty_password)
+        user.save()
+        self.assertFalse(authenticate(username="hello", password=empty_password))
 
-    #     user.set_password(good_password)
-    #     user.save()
-    #     self.assertEqual(
-    #         authenticate(username="hello", password=good_password), user)
+        user.set_password(good_password)
+        user.save()
+        self.assertEqual(
+            authenticate(username="hello", password=good_password), user)
 
     @override_settings(SECURE_LOGIN_CHECKERS=["secure_login.checkers.no_username_password_same", ])
     def test_no_username_password_same(self):
@@ -85,17 +86,18 @@ class SecureLoginBackendTest(TestCase):
         authenticate(username=username, password="not-the-correct-password")
         self.assertEqual(FailedLogin.objects.count(), 1)
 
-    # @override_settings(SECURE_LOGIN_ON_FAIL=["secure_login.on_fail.populate_failed_requests", "secure_login.on_fail.lockout_on_many_wrong_password", ], SECURE_LOGIN_CHECKERS=[])
-    # def test_lockout(self):
-    #     username = "hello"
-    #     password = "hellohello"
-    #     user = User.objects.create_user(username=username, password=password)
-
-    #     for _ in range(11):
-    #         authenticate(
-    #             username=username, password="not-the-correct-password")
-    #     user_ = authenticate(username=username, password=password)
-    #     self.assertFalse(user_.is_active)
+    @override_settings(SECURE_LOGIN_ON_FAIL=["secure_login.on_fail.populate_failed_requests", "secure_login.on_fail.lockout_on_many_wrong_password", ], SECURE_LOGIN_CHECKERS=[])
+    
+    def test_lockout(self):
+        username = "hello"
+        password = "hellohello@1"
+        user = User.objects.create_user(username=username, password=password)
+        for _ in range(11):
+            authenticate(
+                username=username, password="not-the-correct-password")
+        authenticate_inactive = AllowAllUsersModelBackend()
+        user_ = authenticate_inactive.authenticate(username=username,password=password)
+        self.assertFalse(user_.is_active)
 
     def test_email_based_backend(self):
 
