@@ -28,6 +28,25 @@ Features
 * Email user on a failed login attempt for them.
 * Lockout after 10 failed attempts within an hour.
 
+# Requirements
+
+* Python (2.7, 3.4, 3.5)
+* Django (1.10)
+
+# Installation
+
+Install using `pip`...
+
+    pip install django_secure_login
+
+Add `'secure_login'` to your `INSTALLED_APPS` setting.
+
+    INSTALLED_APPS = (
+        ...
+        'secure_login,
+    )
+
+
 Usage
 -----------
 
